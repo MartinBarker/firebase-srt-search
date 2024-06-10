@@ -2,41 +2,58 @@ import React, { useState, useEffect } from 'react';
 import "./App.css";
 
 // DB Connection
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import { collection, addDoc, getDocs, getDoc, doc } from "firebase/firestore";
 import { db } from './firebase';
 
 const SnakeEyesSearch = () => {
+    const [movieSubtitles, setMovieSubtitles] = useState([])
+
     const [todos, setTodos] = useState([]);
     const [filteredTodos, setFilteredTodos] = useState([]);
     const [newTodo, setNewTodo] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
 
-    const fetchTodos = async () => {
-        const querySnapshot = await getDocs(collection(db, "ReactAppTest"));
-        const todoList = querySnapshot.docs.map(doc => ({
-            ...doc.data(),
-            id: doc.id
-        }));
-        setTodos(todoList);
-        setFilteredTodos(todoList);
-    }
+    // Fetch 'SnakeEyes1998' document from 'Media' collection in Firestore
+    const fetchDataFromDB = async () => {
+        try {
+            console.log('fetchDataFromDB()')
+            const movieName = "SnakeEyes1998"
+            const docRef = doc(db, "Media", movieName);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                console.log('Document data:', data);
 
+                // Assuming the data structure fits todos
+                setTodos([data]);
+                setFilteredTodos([data]);
+            } else {
+                console.log('No such document!');
+            }
+        } catch (error) {
+            console.error('Error getting document:', error);
+        }
+    };
+    
+    // Call function on initial dom load to fetch 'todos' from db.
     useEffect(() => {
-        fetchTodos();
+        fetchDataFromDB();
     }, []);
 
+    // Handle when user submits new 'todo' to add to db.
     const handleAddTodo = async (e) => {
         e.preventDefault();
 
         try {
             await addDoc(collection(db, "ReactAppTest"), { todo: newTodo });
-            fetchTodos();  // Fetch the updated list of todos
+            fetchDataFromDB();  // Fetch the updated list of todos
             setNewTodo("");  // Clear the input field
         } catch (error) {
             console.error("Error adding document: ", error);
         }
     }
 
+    // Handle when user searches for text in db results.
     const handleSearch = (e) => {
         const term = e.target.value;
         setSearchTerm(term);
