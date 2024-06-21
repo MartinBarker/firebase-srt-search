@@ -1,3 +1,10 @@
+# Jerma985 Search
+- Clone repo and install with `npm i`
+- Create `.env` file in root of project, use `.env-template` and fill in values.
+- We are using Algolia for searching text.
+- Start with `npm start`
+
+----------------------------------------
 # Goal: Website allowing the user to select a film, which loads animated gifs for every single quote. As the user scrolls down the page more appear seamlessly. Allow the user to search via text for quotes from the gifs too.
 
 ## How to run this repo currently:
